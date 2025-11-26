@@ -1,0 +1,5 @@
+{
+  "name": "Design2React AI",
+  "description": "Upload a Figma design screenshot and instantly generate a pixel-perfect React component using Gemini 3. Features live code preview, real-time AI thought logging, and interactive refinement chat.",
+  "requestFramePermissions": []
+}
