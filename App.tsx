@@ -14,6 +14,7 @@ const App: React.FC = () => {
   const [image, setImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [chatHistory, setChatHistory] = useState<Content[]>([]);
+  const [selectedModel, setSelectedModel] = useState<string>('gemini-3-pro-preview');
   
   // Helper to add logs safely
   const addLog = useCallback((message: string, type: LogEntry['type'] = 'info') => {
@@ -66,7 +67,8 @@ const App: React.FC = () => {
     try {
         const imagePayload = activeImage ? cleanBase64(activeImage) : undefined;
         
-        const stream = streamComponentGeneration(text, imagePayload, chatHistory);
+        // Pass the selected model to the service
+        const stream = streamComponentGeneration(text, selectedModel, imagePayload, chatHistory);
 
         for await (const chunk of stream) {
             accumulatedText += chunk;
@@ -112,7 +114,12 @@ const App: React.FC = () => {
     <div className="flex h-screen w-full bg-black overflow-hidden font-sans">
       {/* LEFT COLUMN: AI LOGS */}
       <div className="w-[350px] flex-shrink-0 h-full">
-        <LogStream logs={logs} isProcessing={isProcessing} />
+        <LogStream 
+            logs={logs} 
+            isProcessing={isProcessing} 
+            selectedModel={selectedModel}
+            onSelectModel={setSelectedModel}
+        />
       </div>
 
       {/* RIGHT COLUMN: WORKSPACE */}

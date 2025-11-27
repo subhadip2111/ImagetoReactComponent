@@ -33,11 +33,10 @@ Your goal is to accept an image of a UI design (Figma screenshot) and generate a
 
 export async function* streamComponentGeneration(
   prompt: string,
+  modelName: string,
   imageBase64?: string,
   history: Content[] = []
 ) {
-  const model = "gemini-3-pro-preview"; 
-
   const parts: Part[] = [];
 
   if (imageBase64) {
@@ -52,7 +51,7 @@ export async function* streamComponentGeneration(
   parts.push({ text: prompt });
 
   const chat = ai.chats.create({
-    model: model,
+    model: modelName,
     config: {
       systemInstruction: SYSTEM_INSTRUCTION,
       temperature: 0.1, // Lower temperature for high precision
