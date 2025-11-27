@@ -14,8 +14,8 @@ const App: React.FC = () => {
   const [image, setImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [chatHistory, setChatHistory] = useState<Content[]>([]);
-  const [selectedModel, setSelectedModel] = useState<string>('Gemini 2.5 Flash Lite');
-  
+  const [selectedModel, setSelectedModel] = useState<string>('gemini-flash-lite-latest');
+  const [apiKey, setApiKey] = useState<string>("");
   // Helper to add logs safely
   const addLog = useCallback((message: string, type: LogEntry['type'] = 'info') => {
     const newLog: LogEntry = {
@@ -26,7 +26,14 @@ const App: React.FC = () => {
     };
     setLogs(prev => [...prev, newLog]);
   }, []);
+//  for testing purpose I am going to set api key in 
 
+console.log("API KEY:",apiKey);
+  React.useEffect(() => {
+    if (apiKey) {
+      localStorage.setItem("GEMINI_API_KEY", apiKey);
+    }
+  }, [apiKey]);
   // Image Upload Handler
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -112,6 +119,48 @@ const App: React.FC = () => {
 
   return (
     <div className="flex h-screen w-full bg-black overflow-hidden font-sans">
+
+      <svg className="h-12 w-12 animate-pulse" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            {/* Outer Circle */}
+            <circle cx="50" cy="50" r="45" fill="none" stroke="url(#gradient1)" strokeWidth="3"/>
+            
+            {/* Design Pen Icon */}
+            <path d="M30 70 L40 40 L60 30 L70 40 L60 60 L40 70 Z" 
+                  fill="none" 
+                  stroke="url(#gradient1)" 
+                  strokeWidth="3" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round"/>
+            
+            {/* React Symbol */}
+            <ellipse cx="50" cy="50" rx="25" ry="10" 
+                     fill="none" 
+                     stroke="url(#gradient2)" 
+                     strokeWidth="2"/>
+            <ellipse cx="50" cy="50" rx="25" ry="10" 
+                     fill="none" 
+                     stroke="url(#gradient2)" 
+                     strokeWidth="2" 
+                     transform="rotate(60 50 50)"/>
+            <ellipse cx="50" cy="50" rx="25" ry="10" 
+                     fill="none" 
+                     stroke="url(#gradient2)" 
+                     strokeWidth="2" 
+                     transform="rotate(120 50 50)"/>
+            <circle cx="50" cy="50" r="4" fill="#58a6ff"/>
+            
+            {/* Gradients */}
+            <defs>
+              <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style={{stopColor: '#58a6ff', stopOpacity: 1}} />
+                <stop offset="100%" style={{stopColor: '#bc8cff', stopOpacity: 1}} />
+              </linearGradient>
+              <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" style={{stopColor: '#79c0ff', stopOpacity: 1}} />
+                <stop offset="100%" style={{stopColor: '#d2a8ff', stopOpacity: 1}} />
+              </linearGradient>
+            </defs>
+          </svg>
       {/* LEFT COLUMN: AI LOGS */}
       <div className="w-[350px] flex-shrink-0 h-full">
         <LogStream 
@@ -119,6 +168,8 @@ const App: React.FC = () => {
             isProcessing={isProcessing} 
             selectedModel={selectedModel}
             onSelectModel={setSelectedModel}
+            apiKey={apiKey}
+            onApiKeyChange={setApiKey}
         />
       </div>
 

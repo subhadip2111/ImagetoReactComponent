@@ -1,53 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <img src="/logo.png" alt="Logo" class="h-10 w-auto" />
 
-    <title>Design2React AI</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              sans: ['Inter', 'sans-serif'],
-              mono: ['JetBrains Mono', 'monospace'],
-            },
-            colors: {
-              gray: {
-                750: '#2d3748',
-                850: '#1a202c',
-                950: '#0d1117',
-              }
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Design2React AI</title>
+  
+  <!-- Favicon using SVG -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g1' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' style='stop-color:%2358a6ff'/><stop offset='100%25' style='stop-color:%23bc8cff'/></linearGradient><linearGradient id='g2' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' style='stop-color:%2379c0ff'/><stop offset='100%25' style='stop-color:%23d2a8ff'/></linearGradient></defs><circle cx='50' cy='50' r='45' fill='none' stroke='url(%23g1)' stroke-width='3'/><path d='M30 70 L40 40 L60 30 L70 40 L60 60 L40 70 Z' fill='none' stroke='url(%23g1)' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/><ellipse cx='50' cy='50' rx='25' ry='10' fill='none' stroke='url(%23g2)' stroke-width='2'/><ellipse cx='50' cy='50' rx='25' ry='10' fill='none' stroke='url(%23g2)' stroke-width='2' transform='rotate(60 50 50)'/><ellipse cx='50' cy='50' rx='25' ry='10' fill='none' stroke='url(%23g2)' stroke-width='2' transform='rotate(120 50 50)'/><circle cx='50' cy='50' r='4' fill='%2358a6ff'/></svg>">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            gray: {
+              750: '#2d3748',
+              850: '#1a202c',
+              950: '#0d1117',
             }
           }
         }
       }
-    </script>
-    <style>
-      body {
-        background-color: #0d1117;
-        color: #e6edf3;
+    }
+  </script>
+  <style>
+    body {
+      background-color: #0d1117;
+      color: #e6edf3;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #0d1117;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #30363d;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #58a6ff;
+    }
+
+    /* Logo Animation */
+    @keyframes float {
+      0%, 100% { 
+        transform: translateY(0px); 
       }
-      /* Custom Scrollbar */
-      ::-webkit-scrollbar {
-        width: 8px;
-        height: 8px;
+      50% { 
+        transform: translateY(-8px); 
       }
-      ::-webkit-scrollbar-track {
-        background: #0d1117; 
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #30363d; 
-        border-radius: 4px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #58a6ff; 
-      }
-    </style>
+    }
+    
+    .logo-float {
+      animation: float 3s ease-in-out infinite;
+    }
+
+    /* Gradient Text */
+    .gradient-text {
+      background: linear-gradient(135deg, #58a6ff 0%, #bc8cff 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+  </style>
   <script type="importmap">
 {
   "imports": {
@@ -60,23 +92,25 @@
   }
 }
 </script>
-
- <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            fontFamily: {
-              mono: ['Fira Code', 'monospace'],
-            }
-          }
-        }
-      }
-    </script>
 </head>
-  <body>
-    <div id="root"></div>
-        <script type="module" src="/index.tsx"></script>
 
-  </body>
+<body>
+  <!-- Header with Logo and Title -->
+  <header class="w-full border-b border-gray-800 bg-gray-950">
+    <div class="container mx-auto px-4 py-4">
+      <div class="flex items-center gap-3">
+      
+
+        <!-- Title -->
+        <!-- <span class="text-2xl font-bold gradient-text">Design2React AI</span> -->
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <div id="root"></div>
+
+  <script type="module" src="/index.tsx"></script>
+</body>
+
 </html>
