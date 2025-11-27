@@ -1,226 +1,156 @@
-import React, { useEffect, useState } from 'react';
-import { RefreshCcw, Monitor, Code, Check, Eye } from 'lucide-react';
+import React, { useState } from 'react';
+import { Code, Check, Zap, Copy } from 'lucide-react';
+import sdk from '@stackblitz/sdk';
 
 interface LivePreviewProps {
   code: string;
 }
 
 export const LivePreview: React.FC<LivePreviewProps> = ({ code }) => {
-  const [iframeSrc, setIframeSrc] = useState<string>('');
-  const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'preview' | 'code'>('preview');
   const [copySuccess, setCopySuccess] = useState(false);
 
-  useEffect(() => {
-    if (!code) {
-        setIframeSrc('');
-        return;
-    }
-
-    try {
-      // 1. Remove markdown fences
-      let cleanCode = code.replace(/```tsx/g, '').replace(/```typescript/g, '').replace(/```jsx/g, '').replace(/```/g, '');
-      
-      // 2. Remove imports (aggressive multiline support)
-      // Matches "import ... from '...';" handling newlines and various formats
-      cleanCode = cleanCode.replace(/import\s+([\s\S]*?)\s+from\s+['"][^'"]+['"];?/g, '');
-      
-      // 3. Transform "export default" to a known variable assignment so we can render it
-      // Case A: export default function Name() {}
-      if (/export\s+default\s+function\s+\w+/.test(cleanCode)) {
-         cleanCode = cleanCode.replace(/export\s+default\s+function\s+(\w+)/, 'const GeneratedComponent = function $1');
-      } 
-      // Case B: export default function() {}
-      else if (/export\s+default\s+function\s*\(/.test(cleanCode)) {
-         cleanCode = cleanCode.replace(/export\s+default\s+function\s*\(/, 'const GeneratedComponent = function(');
-      }
-      // Case C: export default () => {}
-      else if (/export\s+default\s+\(/.test(cleanCode)) {
-         cleanCode = cleanCode.replace(/export\s+default\s+\(/, 'const GeneratedComponent = (');
-      }
-      // Case D: export default MyComponent; (at the end)
-      else if (/export\s+default\s+[\w\d_]+;?/.test(cleanCode)) {
-         cleanCode = cleanCode.replace(/export\s+default\s+([\w\d_]+);?/, 'const GeneratedComponent = $1;');
-      }
-
-      // 4. Strip TS interfaces if needed, though Babel Standalone handles TS usually.
-      // We will rely on Babel for TS stripping.
-
-      const html = `
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <meta charset="UTF-8" />
-            <script src="https://cdn.tailwindcss.com"></script>
-            <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
-            <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
-            <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-            <script src="https://unpkg.com/lucide@latest"></script>
-            <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.min.js"></script>
-            <style>
-                body { background-color: #0d1117; color: white; margin: 0; min-height: 100vh; overflow-x: hidden; font-family: 'Inter', sans-serif; }
-                #root { min-height: 100vh; }
-                ::-webkit-scrollbar { width: 8px; }
-                ::-webkit-scrollbar-track { background: #0d1117; }
-                ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
-                .error { color: #ff6b6b; padding: 20px; font-family: monospace; white-space: pre-wrap; background: rgba(255,0,0,0.1); }
-            </style>
-          </head>
-          <body>
-            <div id="root"></div>
-            <script type="text/babel" data-presets="react,env,typescript">
-              // Setup environment
-              const { useState, useEffect, useRef, useMemo, useCallback } = React;
-              
-              // Expose Lucide icons globally to window so they are available without imports
-              // We check both the UMD global and the potential direct script exposure
-              if (typeof window.lucideReact !== 'undefined') {
-                Object.assign(window, window.lucideReact);
-              } else if (typeof window.lucide !== 'undefined') {
-                Object.assign(window, window.lucide);
-              }
-
-              // Error boundary for rendering
-              class ErrorBoundary extends React.Component {
-                constructor(props) {
-                  super(props);
-                  this.state = { hasError: false, error: null };
-                }
-                static getDerivedStateFromError(error) {
-                  return { hasError: true, error };
-                }
-                componentDidCatch(error, errorInfo) {
-                  console.error("Preview Error:", error, errorInfo);
-                }
-                render() {
-                  if (this.state.hasError) {
-                    return (
-                        <div className="error">
-                            <h3>Runtime Error</h3>
-                            <p>{this.state.error.toString()}</p>
-                        </div>
-                    );
-                  }
-                  return this.props.children;
-                }
-              }
-
-              try {
-                // User Generated Code
-                ${cleanCode}
-
-                // Render
-                const root = ReactDOM.createRoot(document.getElementById('root'));
-                
-                // Determine what to render
-                let ComponentToRender = null;
-                
-                if (typeof GeneratedComponent !== 'undefined') {
-                    ComponentToRender = GeneratedComponent;
-                } else {
-                    // Fallback: Check for a variable named 'App' or 'Component'
-                     if (typeof App !== 'undefined') ComponentToRender = App;
-                     else if (typeof Component !== 'undefined') ComponentToRender = Component;
-                }
-
-                if (ComponentToRender) {
-                   root.render(
-                     <ErrorBoundary>
-                       <ComponentToRender />
-                     </ErrorBoundary>
-                   );
-                } else {
-                   throw new Error("Could not find a component to render. Please ensuring you 'export default' your component.");
-                }
-
-              } catch (err) {
-                document.body.innerHTML = '<div class="error"><h3>Compile/Setup Error</h3><p>' + err.message + '</p></div>';
-                console.error(err);
-              }
-            </script>
-          </body>
-        </html>
-      `;
-
-      setIframeSrc(html);
-      setError(null);
-    } catch (e: any) {
-      setError(e.message);
-    }
-  }, [code]);
-
   const copyCode = () => {
+    if (!code) return;
     navigator.clipboard.writeText(code);
     setCopySuccess(true);
     setTimeout(() => setCopySuccess(false), 2000);
   };
 
+  const openStackBlitz = () => {
+    if (!code) return;
+
+    // Define the StackBlitz project
+    const project = {
+      title: 'Design2React Component',
+      description: 'AI Generated React Component',
+      template: 'create-react-app',
+      files: {
+        'public/index.html': `
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Design2React Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              mono: ['JetBrains Mono', 'monospace'],
+            },
+          }
+        }
+      }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
+        `,
+        'src/index.js': `
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App';
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(
+  <React.StrictMode>
+    <App />
+  </React.StrictMode>
+);
+        `,
+        'src/App.tsx': code,
+        'package.json': JSON.stringify({
+          name: "design2react-demo",
+          version: "1.0.0",
+          description: "Generated by Design2React",
+          dependencies: {
+            "react": "^18.2.0",
+            "react-dom": "^18.2.0",
+            "lucide-react": "^0.292.0",
+            "react-scripts": "5.0.1"
+          },
+          scripts: {
+            "start": "react-scripts start",
+            "build": "react-scripts build",
+            "test": "react-scripts test",
+            "eject": "react-scripts eject"
+          },
+          browserslist: {
+            production: [">0.2%", "not dead", "not op_mini all"],
+            development: ["last 1 chrome version", "last 1 firefox version", "last 1 safari version"]
+          }
+        }, null, 2)
+      },
+      settings: {
+        compile: {
+          trigger: 'auto',
+          clearConsole: false,
+        },
+      },
+    };
+
+    // Open in new window using the SDK
+    sdk.openProject(project as any, { openFile: 'src/App.tsx', newWindow: true });
+  };
+
   return (
-    <div className="w-full h-full flex flex-col bg-gray-900">
-      <div className="h-10 bg-gray-800 border-b border-gray-700 flex items-center justify-between px-4 select-none">
-         <div className="flex items-center gap-4">
-            <span className="text-xs font-semibold uppercase tracking-wider text-gray-400 flex items-center gap-2">
-                <Monitor size={14} /> Result
+    <div className="w-full h-full flex flex-col bg-gray-900 border-b border-gray-800">
+      <div className="h-12 bg-gray-800/50 border-b border-gray-700 flex items-center justify-between px-4 select-none backdrop-blur-sm">
+         <div className="flex items-center gap-3">
+            <span className="text-sm font-semibold text-gray-200 flex items-center gap-2">
+                <Code size={16} className="text-blue-400" /> 
+                Generated Code
             </span>
-            <div className="flex bg-gray-900 rounded-lg p-0.5 border border-gray-700">
-                <button 
-                    onClick={() => setActiveTab('preview')}
-                    className={`flex items-center gap-1.5 px-3 py-1 rounded text-xs font-medium transition-colors ${activeTab === 'preview' ? 'bg-gray-700 text-white shadow-sm' : 'text-gray-400 hover:text-gray-300'}`}
-                >
-                    <Eye size={12} /> Preview
-                </button>
-                <button 
-                    onClick={() => setActiveTab('code')}
-                    className={`flex items-center gap-1.5 px-3 py-1 rounded text-xs font-medium transition-colors ${activeTab === 'code' ? 'bg-gray-700 text-white shadow-sm' : 'text-gray-400 hover:text-gray-300'}`}
-                >
-                    <Code size={12} /> Code
-                </button>
-            </div>
          </div>
          <div className="flex items-center gap-2">
-            {activeTab === 'code' && (
-                <button 
-                    onClick={copyCode}
-                    className="flex items-center gap-1.5 px-2 py-1 text-xs text-gray-400 hover:text-white transition-colors"
-                >
-                    {copySuccess ? <Check size={12} className="text-green-500" /> : <RefreshCcw size={12} className="rotate-0" />}
-                    {copySuccess ? 'Copied' : 'Copy'}
-                </button>
-            )}
+            <button 
+                onClick={copyCode}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium bg-gray-700 hover:bg-gray-600 text-gray-200 transition-colors border border-gray-600"
+                title="Copy to clipboard"
+            >
+                {copySuccess ? <Check size={14} className="text-green-400" /> : <Copy size={14} />}
+                {copySuccess ? 'Copied' : 'Copy'}
+            </button>
+            <button
+                onClick={openStackBlitz}
+                className="flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-medium bg-blue-600 hover:bg-blue-500 text-white transition-all shadow-lg shadow-blue-900/30"
+                title="Open in StackBlitz to run and edit"
+            >
+                <Zap size={14} fill="currentColor" />
+                Run in StackBlitz
+            </button>
          </div>
       </div>
       
-      <div className="flex-1 relative bg-black/50 overflow-hidden">
-        {activeTab === 'preview' ? (
-            <>
-                {code ? (
-                    <iframe 
-                    title="Preview"
-                    srcDoc={iframeSrc}
-                    className="w-full h-full border-none"
-                    sandbox="allow-scripts allow-same-origin"
-                />
-                ) : (
-                    <div className="absolute inset-0 flex items-center justify-center text-gray-600 flex-col gap-2">
-                        <RefreshCcw size={32} className="animate-spin-slow opacity-20" />
-                        <p className="text-sm">Waiting for generation...</p>
-                    </div>
-                )}
-                
-                {error && (
-                    <div className="absolute bottom-4 right-4 bg-red-900/90 text-red-200 p-4 rounded-lg shadow-xl border border-red-700 max-w-md text-sm">
-                        <strong>Preview Error:</strong> {error}
-                    </div>
-                )}
-            </>
-        ) : (
-            <div className="w-full h-full overflow-auto bg-gray-950 p-4">
-                <pre className="font-mono text-xs text-gray-300 whitespace-pre-wrap">
-                    <code>{code || '// Code will appear here...'}</code>
+      <div className="flex-1 relative bg-gray-950 overflow-hidden group">
+        {code ? (
+            <div className="absolute inset-0 overflow-auto custom-scrollbar">
+                <pre className="p-4 text-sm font-mono leading-relaxed text-gray-300 tab-4">
+                    <code>{code}</code>
                 </pre>
+            </div>
+        ) : (
+            <div className="absolute inset-0 flex items-center justify-center text-gray-600 flex-col gap-3">
+                <div className="w-12 h-12 rounded-full bg-gray-800/50 flex items-center justify-center">
+                    <Code size={24} className="opacity-40" />
+                </div>
+                <p className="text-sm">Waiting for code generation...</p>
             </div>
         )}
       </div>
+      <style>{`
+        .tab-4 { tab-size: 2; }
+        .custom-scrollbar::-webkit-scrollbar { width: 10px; height: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #0d1117; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #2d3748; border-radius: 5px; border: 2px solid #0d1117; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #4a5568; }
+      `}</style>
     </div>
   );
 };
