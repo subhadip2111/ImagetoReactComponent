@@ -14,7 +14,7 @@ const App: React.FC = () => {
   const [image, setImage] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [chatHistory, setChatHistory] = useState<Content[]>([]);
-  const [selectedModel, setSelectedModel] = useState<string>('gemini-3-pro-preview');
+  const [selectedModel, setSelectedModel] = useState<string>('Gemini 2.5 Flash Lite');
   
   // Helper to add logs safely
   const addLog = useCallback((message: string, type: LogEntry['type'] = 'info') => {
