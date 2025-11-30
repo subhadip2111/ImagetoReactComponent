@@ -1,5 +1,5 @@
 import { GoogleGenAI, Content, Part } from "@google/genai";
-const secrectKey = localStorage.getItem("GEMINI_API_KEY") 
+const secrectKey = localStorage.getItem("GEMINI_API_KEY") || process.env.GEMINI_API_KEY 
 ;
 const ai = new GoogleGenAI({ apiKey: secrectKey });
 
