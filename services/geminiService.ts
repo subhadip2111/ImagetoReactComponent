@@ -1,6 +1,5 @@
 import { GoogleGenAI, Content, Part } from "@google/genai";
 const secrectKey = localStorage.getItem("GEMINI_API_KEY") 
-console.log("Loaded API KEY from localStorage:", secrectKey);
 ;
 const ai = new GoogleGenAI({ apiKey: secrectKey });
 
@@ -51,7 +50,7 @@ export async function* streamComponentGeneration(
   }
 
   parts.push({ text: prompt });
-
+console.log("modelName",modelName);
   const chat = ai.chats.create({
     model: modelName,
     config: {

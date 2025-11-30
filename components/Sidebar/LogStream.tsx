@@ -41,9 +41,16 @@ export const LogStream: React.FC<LogStreamProps> = ({ logs, isProcessing, select
               disabled={isProcessing}
               className="w-full bg-gray-900 hover:bg-gray-800 border border-gray-700 text-gray-300 text-xs rounded p-2 pr-8 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none appearance-none transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <option value="gemini-3-pro-preview">Gemini 3.0 Pro (Premier Code Gen)</option>
-              <option value="gemini-2.5-flash">Gemini 2.5 Flash (Balanced)</option>
-              <option value="gemini-flash-lite-latest">Gemini 2.5 Flash Lite (Fastest)</option>
+              <option value="gemini-3-pro-preview">Gemini 3.0 Pro (Most Capable/Preview)</option>
+              <option value="gemini-2.5-pro">Gemini 2.5 Pro (Powerful, Complex Reasoning)</option>
+
+              <option value="gemini-2.5-flash" selected>Gemini 2.5 Flash (Balanced Speed & Intelligence)</option>
+              <option value="gemini-2.0-flash">Gemini 2.0 Flash (Reliable Multimodal Workhorse)</option>
+
+              <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash-Lite (Fastest, Lowest Latency)</option>
+
+              <option value="gemini-2.5-flash-image">Gemini 2.5 Flash Image (Image Generation/Editing)</option>
+
             </select>
             <div className="absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
               <Settings size={12} />
