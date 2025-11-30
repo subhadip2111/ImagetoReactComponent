@@ -1,7 +1,7 @@
 import { GoogleGenAI, Content, Part } from "@google/genai";
-const secrectKey = localStorage.getItem("GEMINI_API_KEY") || process.env.GEMINI_API_KEY 
+const secrectKey = process.env.GEMINI_API_KEY 
 ;
-const ai = new GoogleGenAI({ apiKey: secrectKey });
+const ai = new GoogleGenAI({ apiKey: secrectKey, });
 
 // System instruction to guide the model's persona and output format
 const SYSTEM_INSTRUCTION = `

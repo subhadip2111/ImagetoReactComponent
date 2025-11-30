@@ -11,7 +11,7 @@ interface LogStreamProps {
   onSelectModel: (model: string) => void;
 }
 
-export const LogStream: React.FC<LogStreamProps> = ({ logs, isProcessing, selectedModel, onSelectModel, apiKey, onApiKeyChange }) => {
+export const LogStream: React.FC<LogStreamProps> = ({ logs, isProcessing, selectedModel, onSelectModel }) => {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -57,7 +57,7 @@ export const LogStream: React.FC<LogStreamProps> = ({ logs, isProcessing, select
             </div>
           </div>
         </div>
-        <div className="space-y-1">
+        {/* <div className="space-y-1">
           <label className="text-[10px] uppercase tracking-wider text-gray-500 font-semibold">Add your api keys</label>
           <div className="relative">
             <input
@@ -72,7 +72,7 @@ export const LogStream: React.FC<LogStreamProps> = ({ logs, isProcessing, select
               <Settings size={12} />
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">

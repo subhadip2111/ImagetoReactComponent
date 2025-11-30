@@ -28,12 +28,7 @@ const App: React.FC = () => {
   }, []);
 //  for testing purpose I am going to set api key in 
 
-console.log("API KEY:",apiKey);
-  React.useEffect(() => {
-    if (apiKey) {
-      localStorage.setItem("GEMINI_API_KEY", apiKey);
-    }
-  }, [apiKey]);
+
   // Image Upload Handler
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -168,8 +163,7 @@ console.log("API KEY:",apiKey);
             isProcessing={isProcessing} 
             selectedModel={selectedModel}
             onSelectModel={setSelectedModel}
-            apiKey={apiKey}
-            onApiKeyChange={setApiKey}
+         
         />
       </div>
 
